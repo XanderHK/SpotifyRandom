@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import Cookies from 'universal-cookie';
 
 function Liked() {
 
@@ -12,13 +11,10 @@ function Liked() {
     }[]>([]);
 
     useEffect(() => {
-        const cookies = new Cookies();
-        const cookie = cookies.get('liked-songs');
-        console.log(cookies.get('liked-songs'))
-        if (cookie) {
-            setLiked(cookie);
+        const liked = localStorage.getItem('liked-songs');
+        if (liked) {
+            setLiked(JSON.parse(liked));
         }
-
     }, [])
 
     const handleAudioControl = (e: React.MouseEvent) => {
@@ -33,6 +29,17 @@ function Liked() {
             }
         } catch (e) {
             console.log(e)
+        }
+    }
+
+    const handleRemove = (e: React.MouseEvent) => {
+        const liked = localStorage.getItem('liked-songs');
+        if (liked) {
+            const parsed = JSON.parse(liked);
+            parsed.splice(e.currentTarget.id, 1)
+            localStorage.removeItem('liked-songs');
+            localStorage.setItem('liked-songs', JSON.stringify(parsed));
+            setLiked(parsed);
         }
     }
 
@@ -54,6 +61,9 @@ function Liked() {
                                         </div>
                                         <div className="row mt-3">
                                             <div className="col-12">
+                                                <button onClick={handleRemove} type="button" className="btn btn-danger btn-circle btn-xl mr-1" id={`${index}`}>
+                                                    <i className="fa-solid fa-minus fa-xl" style={{ color: "black" }}></i>
+                                                </button>
                                                 <a href={track.spotify_url} target="_blank" rel="noopener noreferrer">
                                                     <button type="button" className="btn spotify-green btn-circle btn-xl">
                                                         <i

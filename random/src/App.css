@@ -1,11 +1,11 @@
 @font-face {
   font-family: Gotham;
-  src: url("./fonts/Gotham.otf") format("opentype");
+  src: url("./assets/fonts/Gotham.otf") format("opentype");
 }
 
 @font-face {
   font-family: GothamLight;
-  src: url("./fonts/GothamLight.otf") format("opentype");
+  src: url("./assets/fonts/GothamLight.otf") format("opentype");
 }
 
 body {

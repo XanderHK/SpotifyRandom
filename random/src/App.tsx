@@ -1,101 +1,61 @@
 import { useEffect, useRef, useState } from 'react';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import './App.css';
-import { getTrack } from './utils';
-import Cookies from 'universal-cookie';
+import Liked from './Liked';
+import Random from './Random';
+import Logo from './assets/images/logo.png'
+import Select, { SingleValue } from 'react-select'
+import Genres from './assets/genres';
 
 function App() {
 
-	const [track, setTrack] = useState<{
-		image: string
-		name: string
-		preview_url: string | null
-		spotify_url: string
-	}>();
-
-	const audioRef = useRef<HTMLAudioElement>(null);
+	const [options, setOptions] = useState<{ value: string, label: string }[]>([])
+	const [selected, setSelected] = useState<SingleValue<{ value: string, label: string }>>()
 
 	useEffect(() => {
-		handleAction()
+		setOptions(Genres.split("\n").map(genre => {
+			return {
+				value: genre,
+				label: genre
+			}
+		}))
 	}, [])
 
-	const handleAudioControl = () => {
-		if (audioRef.current) {
-			if (audioRef.current.paused) {
-				audioRef.current.play();
-			} else {
-				audioRef.current.pause();
-			}
-		}
-	}
-
-	const handleAction = () => {
-		getTrack().then(res => setTrack(res[0]));
-	}
-
-	const handleLike = () => {
-		const cookies = new Cookies();
-		const cookie = cookies.get('liked-songs');
-		const current = new Date();
-		const nextYear = new Date();
-
-		nextYear.setFullYear(current.getFullYear() + 1);
-		if (cookie) {
-			cookies.set('liked-songs', [...cookie, track], { path: '/', expires: nextYear, });
-			return
-		}
-		cookies.set('liked-songs', [track], { path: '/' });
+	const handleChange = (selectedValue: SingleValue<{ value: string; label: string; }>) => {
+		setSelected(selectedValue)
 	}
 
 	return (
 		<div className="App">
-			<div className="track">
-				<div className=" h-100 d-flex justify-content-center align-items-center mt-5">
-					{track && (
-						<div className="card">
-							<div className="wrapper">
-								<img onClick={handleAudioControl} src={track.image}
-									className="card-img-top rounded mx-auto d-block" alt={track.name} />
-								<div className="description">
-									<div className="row">
-										<div className="col-12">
-											<h3 className="fillSpace px-2">{track.name}</h3>
-										</div>
-									</div>
-									<div className="row mt-3">
-										<div className="col-12">
-											<button onClick={handleAction} type="button" className="btn btn-danger btn-circle btn-xl mr-1">
-												<i className="fa-solid fa-thumbs-down fa-xl"></i>
-											</button>
-											<a href={track.spotify_url} target="_blank" rel="noopener noreferrer">
-												<button type="button" className="btn spotify-green btn-circle btn-xl">
-													<i
-														className="fa-brands fa-spotify fa-xl"></i>
-												</button>
-											</a>
-											<button onClick={() => {
-												handleAction()
-												handleLike()
-											}} type="button" className="btn btn-success btn-circle btn-xl ml-1">
-												<i className="fa-solid fa-thumbs-up fa-xl"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div className="card-body">
-								<br />
-								{track.preview_url ? (<audio
-									src={track.preview_url}
-									ref={audioRef}
-								>
-									Your browser does not support the
-									<code>audio</code> element.
-								</audio>) : (<p className="text-danger">No preview available</p>)}
-							</div>
-						</div>
-					)}
-				</div>
-			</div>
+			<BrowserRouter>
+				<nav className="navbar fixed-top navbar-expand-lg custom-nav navbar-dark">
+					<a className="navbar-brand" href="/"><img src={Logo} style={{ width: 32, height: 32 }} alt="logo" /></a>
+					<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+						<span className="navbar-toggler-icon"></span>
+					</button>
+					<div className="collapse navbar-collapse" id="navbarNav">
+						<ul className="navbar-nav mr-auto mt-2 mt-lg-0">
+							<li className="nav-item">
+								<Link to="/" className="nav-link">Home</Link>
+							</li>
+							<li className="nav-item">
+								<Link to="/liked" className="nav-link">Liked</Link>
+							</li>
+						</ul>
+						<form className="form-inline my-2 my-lg-0">
+							<Select options={options} onChange={handleChange} value={selected} styles={{
+								option: () => ({
+									color: 'black',
+								})
+							}} />
+						</form>
+					</div>
+				</nav>
+				<Routes>
+					<Route path="/" element={<Random genre={selected} />}></Route>
+					<Route path="liked" element={<Liked />}></Route>
+				</Routes>
+			</BrowserRouter>
 		</div>
 	);
 }

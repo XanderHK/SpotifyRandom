@@ -1,16 +1,17 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import queueReducer from './reducers/queue';
 
 export const store = configureStore({
-  reducer: {
-    // reducer
-  },
+    reducer: {
+        queue: queueReducer
+    },
 });
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
+    ReturnType,
+    RootState,
+    unknown,
+    Action<string>
 >;

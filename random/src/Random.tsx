@@ -2,13 +2,32 @@ import { useEffect, useRef, useState } from 'react'
 import Genres from './assets/genres'
 import Select, { SingleValue } from 'react-select'
 import './App.css'
-import { getTrack } from './utils'
+import { addTrackToPlaylist, getTrack } from './utils'
+import { useAppSelector } from './app/hooks'
+import { selectData } from './app/selectors/global'
 
 function Random() {
   const [options, setOptions] = useState<{ value: string; label: string }[]>([])
   const [selected, setSelected] = useState<
     SingleValue<{ value: string; label: string }>
   >()
+  const [track, setTrack] = useState<{
+    uri: string
+    image: string
+    name: string
+    preview_url: string | null
+    spotify_url: string
+  }>()
+
+  const [loading, setLoading] = useState(false)
+
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  const accessToken = useAppSelector((state) =>
+    selectData(state, 'accessToken'),
+  )
+  const playlistId = useAppSelector((state) => selectData(state, 'playlistId'))
+  const user = useAppSelector((state) => selectData(state, 'user'))
 
   useEffect(() => {
     setOptions(
@@ -26,17 +45,6 @@ function Random() {
   ) => {
     setSelected(selectedValue)
   }
-
-  const [track, setTrack] = useState<{
-    image: string
-    name: string
-    preview_url: string | null
-    spotify_url: string
-  }>()
-
-  const [loading, setLoading] = useState(false)
-
-  const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
     handleAction()
@@ -77,6 +85,14 @@ function Random() {
       'liked-songs',
       JSON.stringify([...JSON.parse(liked), track]),
     )
+
+    if (accessToken && playlistId && user && track) {
+      addTrackToPlaylist({
+        accessToken,
+        playlistId,
+        trackId: track.uri,
+      })
+    }
   }
 
   return (
@@ -157,6 +173,7 @@ function Random() {
                     }}
                   />
                 </form>
+                {/* <Connect /> */}
               </div>
             </div>
           ) : (

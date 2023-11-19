@@ -26,7 +26,13 @@ function Pagination<T>(props: P<T>) {
 
   return (
     <>
-      <div className="row">{currentItems.map((item, index) => item)}</div>
+      <div className="row">
+        {currentItems.map((item, index) => (
+          <div className="col-md-4" key={index}>
+            {item}
+          </div>
+        ))}
+      </div>
       <div className="row justify-content-center">
         <nav>
           <button

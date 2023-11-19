@@ -11,6 +11,7 @@
 body {
   background-color: #191414;
   height: 100%;
+  color:white;
 }
 
 .card {
@@ -128,6 +129,6 @@ h3.fillSpace
   font-size: 18px; /* Increase font size */
 }
 
-.pagination-buttons {
-  background-color: #1DB954;
+.connect-btn {
+  color : white;
 }

@@ -40,13 +40,8 @@ const Suggestions: React.FC<WrappedComponentProps> = ({
     setSelectedValue(event.target.value)
   }
 
-  // const setSuggestionsInEffect = async () => {
-  //   const [data, err] = await getSuggestions<Suggestion[]>(selectedValue)
-  //   if (err) return
-  //   if (data) setSuggestions(data)
-  // }
-
   const setSuggestionsInEffect = useCallback(async () => {
+    if (!selectedValue) return
     const [data, err] = await getSuggestions<Suggestion[]>(selectedValue)
     if (err) return
     if (data) setSuggestions(data)
@@ -101,7 +96,7 @@ const Suggestions: React.FC<WrappedComponentProps> = ({
         <div className="row mt-2">
           {suggestions.map((track, index) => (
             <div className="col-md-4" key={index}>
-              <div className="card">
+              <div className="card" key={index}>
                 <div className="wrapper">
                   <img
                     onClick={(e) => handleAudioControl(e)}
@@ -156,17 +151,17 @@ const Suggestions: React.FC<WrappedComponentProps> = ({
               </div>
             </div>
           ))}
-          <div className="col-md-4">
-            <button
-              onClick={() => {
-                setSuggestionsInEffect()
-              }}
-              type="button"
-              className="btn btn-secondary btn-circle btn-xl ml-1"
-            >
-              <i className="fa fa-repeat fa-xl"></i>
-            </button>
-          </div>
+        </div>
+        <div className="row justify-content-center">
+          <button
+            onClick={() => {
+              setSuggestionsInEffect()
+            }}
+            type="button"
+            className="btn btn-secondary btn-circle btn-xl ml-1"
+          >
+            <i className="fa fa-repeat fa-xl"></i>
+          </button>
         </div>
       </div>
     </div>

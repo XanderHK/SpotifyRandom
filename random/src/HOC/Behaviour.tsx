@@ -1,11 +1,7 @@
 import { RefObject, useEffect, useRef, useState } from 'react'
 
-// Define a type for the props of the HOC
-type HOCProps = {
-  // Define any props specific to the HOC here, if needed
-}
+type HOCProps = {}
 
-// Define a type for the props of the wrapped component
 export type WrappedComponentProps = {
   handleAudioControl: (event: React.MouseEvent) => void
 }
@@ -46,40 +42,20 @@ const WithSharedHOC = <P extends HOCProps>(
     const [prevAudio, setPrevAudio] = useState<HTMLAudioElement>()
     const handleAudioControl = (e: React.MouseEvent) => {
       try {
-        if (prevAudio) {
-          prevAudio.pause()
-        }
+        const audio =
+          e.currentTarget.parentNode?.parentNode?.lastChild?.lastChild
 
-        const audio = e.currentTarget.parentNode?.parentNode?.lastChild
-          ?.lastChild as HTMLAudioElement
-
-        if (audio) {
-          if (prevAudio?.src === audio.src) {
-            audio.pause()
-          } else {
-            if (audio.paused) {
-              audio.play()
-            } else {
-              audio.pause()
-            }
+        if (audio instanceof HTMLAudioElement) {
+          if (prevAudio) {
+            prevAudio.pause()
+            prevAudio.currentTime = 0
           }
-
-          // if prevaudio is paused and prevaudio src is the same as audio source play
-
-          // if prevaudio src is not the same as audio source pause prevaudio and play audio
-          // if (prevAudio?.paused && prevAudio.src !== audio.src) {
-          //   audio.play()
-          //   prevAudio.pause()
-          //   setPrevAudio(audio)
-          //   return
-          // }
-
-          // if (prevAudio?.paused && prevAudio.src === audio.src) {
-          //   audio.play()
-          //   prevAudio.pause()
-          //   setPrevAudio(audio)
-          //   return
-          // }
+          if (prevAudio === audio) {
+            setPrevAudio(undefined)
+          } else {
+            setPrevAudio(audio)
+            audio.play()
+          }
         }
       } catch (e) {
         console.log(e)
